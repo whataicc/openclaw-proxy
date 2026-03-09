@@ -170,9 +170,18 @@ openclaw onboard
 
 **3. 选择AI模型**：
 
-选择你的AI供应商（支持国内外主流模型）：
+选择你的AI供应商选择Custom Provider：
 
-![](https://pic.imgdd.cc/item/69a7c594a9cdb1e92dcd14fb.png)  
+![](https://pic.imgdd.cc/item/69ae57ebb4a2eb58b526f991.png)  
+
+**4. 输入BaseURL和API Key**：
+
+输入模型BaseURL：`https://api.whatai.cc/v1`，输入对应的API Key，选择`OpenAI-compatible`，输入模型ID如：`claude-sonnet-4-6`
+
+![](https://pic.imgdd.cc/item/69ae582bb4a2eb58b526fb6c.png)  
+![](https://pic.imgdd.cc/item/69ae5878b4a2eb58b526fd76.png)  
+![](https://pic.imgdd.cc/item/69ae58e8b4a2eb58b52700e7.png)  
+
 
 **4. 输入API Key**：
 
@@ -223,11 +232,10 @@ openclaw channels status
 # Gateway reachable.
 ```
 
+
 ### Windows本地部署
 
 > 🪟 **Windows用户**：完全可用，但部分系统集成功能受限。
-
-#### 系统要求
 
 **硬件要求**：
 
@@ -242,8 +250,139 @@ openclaw channels status
 **前置软件**：
 
 * Node.js 22.0.0+
+  
+#### 部署方式选择
 
-#### PowerShell原生部署
+Windows有两种部署方式：
+
+1. **WSL2 + Ubuntu（强烈推荐）**：官方推荐方式，提供完整Linux环境支持
+2. **PowerShell原生部署**：纯Windows环境，适合不想使用WSL2的用户
+
+#### 方式一：WSL2 + Ubuntu部署（强烈推荐）
+
+这是官方推荐的Windows部署方式，提供最完整的Linux环境支持。
+
+##### 第一步：启用WSL2
+
+**以管理员身份打开PowerShell**，执行：
+
+```powershell
+# 启用WSL功能
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+# 设置WSL 2为默认版本
+wsl --set-default-version 2
+```
+**重启计算机**。
+
+##### 第二步：安装Ubuntu
+
+**方法一：Microsoft Store安装（推荐）**
+
+1. 打开Microsoft Store，本地商店或者网页：https://apps.microsoft.com/search?query=Ubuntu+22.04+LTS&hl=zh-CN&gl=CN
+2. 搜索「Ubuntu 22.04 LTS」或「Ubuntu 24.04 LTS」
+3. 点击「获取」并安装
+4. 首次启动设置用户名和密码
+
+安装完成后会自动打开Ubuntu终端，按提示设置用户名和密码。
+
+![](https://pic.imgdd.cc/item/69ae24c8fe73d60a1df4c3b2.png)
+
+
+##### 第三步：更新Ubuntu系统
+
+在Ubuntu终端中执行：
+
+```bash
+# 更新软件包列表
+sudo apt update && sudo apt upgrade -y
+
+# 安装基础工具
+sudo apt install -y curl git wget build-essential
+```
+
+![](https://pic.imgdd.cc/item/69ae2551fe73d60a1df4c632.png)
+
+##### 第四步：安装Node.js 22+
+
+```bash
+#运行 NVM 安装脚本
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+#使 NVM 生效
+source ~/.bashrc
+
+#安装 Node.js：
+nvm install 22
+
+#验证 Node.js 版本（必须≥22.x）
+node --version
+npm --version
+```
+##### 第五步：安装 OpenClaw
+
+**一键脚本安装**
+
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+```
+
+![](https://pic.imgdd.cc/item/69ae2756fe73d60a1df4d941.png)
+
+**选择AI模型**：
+
+选择你的AI供应商选择Custom Provider：
+
+![](https://pic.imgdd.cc/item/69ae57ebb4a2eb58b526f991.png)  
+
+**输入BaseURL和API Key**：
+
+输入模型BaseURL：`https://api.whatai.cc/v1`，输入对应的API Key，选择`OpenAI-compatible`，输入模型ID如：`claude-sonnet-4-6`
+
+![](https://pic.imgdd.cc/item/69ae582bb4a2eb58b526fb6c.png)  
+![](https://pic.imgdd.cc/item/69ae5878b4a2eb58b526fd76.png)  
+![](https://pic.imgdd.cc/item/69ae58e8b4a2eb58b52700e7.png)  
+
+##### 第六步：验证安装
+
+```bash
+# 查看版本
+openclaw --version
+
+# 查看帮助
+openclaw --help
+
+# 查看系统状态
+openclaw status
+```
+##### 第七步：配置Windows访问WSL2服务
+
+由于OpenClaw运行在WSL2中，需要配置端口转发以便Windows访问。
+
+**创建启动脚本** `start-openclaw.bat`：
+
+```batch
+@echo off
+echo Starting OpenClaw Gateway in WSL2...
+wsl -d Ubuntu-22.04 -u root service openclaw start
+timeout /t 3
+start http://localhost:18789
+```
+或直接在WSL2中启动：
+
+```bash
+# 在WSL2 Ubuntu终端中
+openclaw gateway run --port 18789
+```
+然后在Windows浏览器访问 `http://localhost:18789`
+
+---
+
+
+
+
+#### PowerShell原生部署(不推荐)
 
 ##### 第一步：安装Node.js 22+
 
@@ -255,7 +394,7 @@ openclaw channels status
 
 ##### 第二步：验证Node.js安装
 
-```
+```bash
 # 打开PowerShell
 node -v
 npm -v
@@ -265,7 +404,7 @@ npm -v
 
 **重要**：必须以**管理员身份**运行PowerShell。
 
-```
+```bash
 # 安装最新稳定版
 npm install -g openclaw@latest
 
@@ -277,7 +416,7 @@ npm install -g @qingchencloud/openclaw-zh@latest
 
 如果遇到权限错误：
 
-```
+```bash
 # 方法A：启用PowerShell脚本执行
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
@@ -291,7 +430,7 @@ npm config set cache "C:\npm-cache"
 
 ##### 第五步：验证安装
 
-```
+```bash
 openclaw --version
 openclaw --help
 ```
@@ -300,7 +439,7 @@ openclaw --help
 
 **问题：sharp模块加载失败**
 
-```
+```bash
 # 清理npm缓存
 npm cache clean --force
 
@@ -325,11 +464,14 @@ C:\Users\你的用户名\.openclaw
 
 启动初始化向导
 
-```
+```bash
 openclaw onboard --install-daemon
 ```
 
 ***
+
+
+
 
 ### Linux本地部署
 
@@ -373,41 +515,73 @@ openclaw --version
 ```
 openclaw onboard
 ```
-
 ## OpenClaw配置神马中转API
 
-OpenClaw 的配置文件位置通常如下： **系统文件路径示例** Windows:`C:Users用户名.openclawopenclaw.json` macOS:`~/.openclaw/openclaw.json` Linux:`~/.openclaw/openclaw.json`  
+下面介绍三种方法设置OpenClaw配置神马中转API
+
+### 1.安装时直接设置
+
+**选择AI模型**：
+
+选择你的AI供应商选择Custom Provider：
+
+![](https://pic.imgdd.cc/item/69ae57ebb4a2eb58b526f991.png)  
+
+**4. 输入BaseURL和API Key**：
+
+输入模型BaseURL：`https://api.whatai.cc/v1`，输入对应的API Key，选择`OpenAI-compatible`，输入模型ID如：`claude-sonnet-4-6`
+
+![](https://pic.imgdd.cc/item/69ae582bb4a2eb58b526fb6c.png)  
+![](https://pic.imgdd.cc/item/69ae5878b4a2eb58b526fd76.png)  
+![](https://pic.imgdd.cc/item/69ae58e8b4a2eb58b52700e7.png)  
+
+### 2.安装完毕可视化修改
+
+启动openclaw之后左侧菜单【设置-配置】- Models - 输入模型BaseURL：`https://api.whatai.cc/v1`，输入对应的API Key，选择`OpenAI-compatible`，输入模型ID如：`claude-sonnet-4-6`
+
+![](https://pic.imgdd.cc/item/69ae59beb4a2eb58b5270796.png)  
+
+
+### 3.其他版本可修改配置文件
+
+OpenClaw 的配置文件位置通常如下： **系统文件路径示例** 
+
+Windows:`C:Users用户名.openclawopenclaw.json` 
+
+macOS:`~/.openclaw/openclaw.json` 
+
+Linux:`~/.openclaw/openclaw.json`  
 
 需要手动编辑配置文件 `~/.openclaw/openclaw.json`，指定：
 
 * `baseUrl`：API服务地址
 * `apiKey`：认证密钥
-* `api`：API协议类型（如 `openai-chat`、`anthropic-messages`）
+* `api`：API协议类型（如 `openai-completions`、`anthropic-messages`）
 * `models`：模型列表和参数
 
 #### 配置神马中转API代理
 
 如果你使用API代理服务，配置如下：
 
-```
+```json
 {
   "models": {
     "mode": "merge",
     "providers": {
       "whataicc": {
         "baseUrl": "https://api.whatai.cc/v1",
-        "apiKey": "sk-or-v1-你的密钥",
+        "apiKey": "sk-xxxxx-你的神马中转API密钥",
         "auth": "api-key",
-        "api": "openai-chat",
+        "api": "openai-completions",
         "models": [
           {
-            "id": "anthropic/claude-sonnet-4-6",
+            "id": "claude-sonnet-4-6",
             "name": "claude-sonnet-4-6",
             "contextWindow": 200000,
             "maxTokens": 8192
           },
           {
-            "id": "openai/gpt-4",
+            "id": "gpt-4",
             "name": "GPT-4",
             "contextWindow": 128000,
             "maxTokens": 4096
@@ -419,7 +593,7 @@ OpenClaw 的配置文件位置通常如下： **系统文件路径示例** Windo
   "agents": {
     "defaults": {
       "model": {
-        "primary": "whataicc/anthropic/claude-sonnet-4-6"
+        "primary": "whataicc/claude-sonnet-4-6"
       }
     }
   }
@@ -435,7 +609,7 @@ OpenClaw 的配置文件位置通常如下： **系统文件路径示例** Windo
 | `baseUrl`       | API服务地址 | `https://api.whatai.cc`            |
 | `apiKey`        | API 密钥  | `sk-xxx`                           |
 | `auth`          | 认证方式    | `api-key` 或 `bearer`               |
-| `api`           | API协议   | `openai-chat`、`anthropic-messages` |
+| `api`           | API协议   | `openai-completions`、`anthropic-messages` |
 | `id`            | 模型ID    | `deepseek-chat`                    |
 | `name`          | 显示名称    | `DeepSeek Chat`                    |
 | `contextWindow` | 上下文窗口   | `64000`                            |
@@ -445,7 +619,7 @@ OpenClaw 的配置文件位置通常如下： **系统文件路径示例** Windo
 
  
 
-* `openai-chat`：OpenAI兼容接口（最常用）
+* `openai-completions`：OpenAI兼容接口（最常用）
 * `anthropic-messages`：Anthropic Claude接口
 * `google-generative-ai`：Google Gemini接口
 
@@ -453,7 +627,7 @@ OpenClaw 的配置文件位置通常如下： **系统文件路径示例** Windo
 
  
 
-```
+```bash
 # 方式1：重启Gateway
 openclaw gateway restart
 
@@ -469,13 +643,15 @@ systemctl --user restart openclaw-gateway.service
 
  
 
-```
+```bash
 # 查看当前配置的模型
 openclaw models list
 
 # 测试模型连接
-openclaw models test whataicc/anthropic/claude-sonnet-4-6
+openclaw models test whataicc/claude-sonnet-4-6
 ```
+
+
 
 ## 常见问题及解决方案
 
